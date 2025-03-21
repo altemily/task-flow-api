@@ -3,12 +3,14 @@ const { pool } = require('../../../config/database')
 
 class TasksModel{
 
-  static async criar(id, titulo, descricao, status, prazo, categoria){
-    const dados = [id, titulo, descricao, status, prazo, categoria]
-    const consulta = `INSERT INTO tarefas(id, titulo, descricao, status, prazo, categoria)
-                       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`
-    const newTask = await pool.query(consulta, dados)
-    return newTask.rows
+  static async criar(titulo, descricao, status, prazo, categoria){
+    const dados = [titulo, descricao, status, prazo, categoria];
+    const consulta = `INSERT INTO tarefas (titulo, descricao, status, prazo, categoria)
+                      VALUES ($1, $2, $3, $4, $5) RETURNING *`;
+    
+    const newTask = await pool.query(consulta, dados);
+    return newTask.rows;
+
   }
   static async editar(id, titulo, descricao, status, prazo, categoria){
     const dados = [id, titulo, descricao, status, prazo, categoria]

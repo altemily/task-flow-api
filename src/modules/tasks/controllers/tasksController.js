@@ -7,7 +7,7 @@ class TasksController {
       if (!titulo || !descricao || !status || !prazo || !categoria){
         return resposta.status(400).json({mensagem: "Todos os campos devem ser preenchidos!"})
       }
-      const newTask = await TasksModel.criar({titulo, descricao, status, prazo, categoria});
+      const newTask = await TasksModel.criar(titulo, descricao, status, prazo, categoria);
       resposta.status(201).json({mensagem: "Tarefa criada com sucesso!!", Tarefa: newTask});
     } catch (error) {
       resposta.status(500).json({mensagem:"Erro ao criar tarefa.", erro: error.message});
@@ -21,8 +21,8 @@ class TasksController {
       if (!titulo || !descricao || !status || !prazo || !categoria){
         return resposta.status(400).json({mensagem: "Pelo menos um campo deve ser atualizado."});
       }
-      const taskAtualizada = await TasksModel.editar(id, {titulo, descricao, status, prazo, categoria});
-      if(!taskAtualizada) {
+      const taskAtualizada = await TasksModel.editar(id, titulo, descricao, status, prazo, categoria);
+      if(taskAtualizada === 0) {
         return resposta.status(200).json({mensagem: "Tarefa atualizada com sucesso!", Tarefa: taskAtualizada});
       }
     } catch (error) {
@@ -46,7 +46,7 @@ class TasksController {
     try {
       const id = requisicao.params.id;
       const task = await TasksModel.listarPorID(id);
-      if(!task) {
+      if(task.length === 0) {
         return resposta.status(404).json({mensagem: "Tarefa não encontrada."});
       }
       resposta.status(200).json(task)
@@ -58,10 +58,11 @@ class TasksController {
   static async excluirPorID(requisicao, resposta){
     try {
       const id = requisicao.params.id;
-      const taskExcluida = await TasksModel.excluirPorID(id);
+      const taskExcluida = await TasksModel.listarPorID(id);
       if(!taskExcluida) {
         return resposta.status(400).json({mensagem: "Tarefa não encontrada!"});
       }
+      await TasksModel.excluirPorID(id)
       resposta.status(200).json({mensagem: "Tarefa excluída com sucesso!"});
     } catch (error) {
       resposta.status(500).json({mensagem: "Erro ao buscar tarefa.", erro: error.message});
